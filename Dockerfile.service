@@ -25,15 +25,18 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 RUN apk add --no-cache nginx bash curl python3 py3-pip
 
-# Copy uv binary
+# Copy the 'uv' binary
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Create a venv and install mcpo into it
+# Create the venv
 RUN uv venv /opt/venv
-RUN uv pip install --no-cache mcpo
 
-# Add the venv to the PATH so 'mcpo' is available everywhere
+# Tell uv and the system to use this venv
+ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+
+# Install mcpo (it will now automatically target /opt/venv)
+RUN uv pip install --no-cache mcpo
 
 # Copy built app and install prod deps only
 COPY --from=builder /app/dist ./dist
