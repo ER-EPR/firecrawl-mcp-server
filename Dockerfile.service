@@ -24,8 +24,12 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 RUN apk add --no-cache nginx bash curl python3 py3-pip
-RUN ln -sf python3 /usr/bin/python
-RUN pip install mcpo uv
+
+# Install uv using the official installer script
+ADD --chmod=755 https://astral.sh /install.sh
+RUN /install.sh && rm /install.sh
+# Use uv to install mcpo (uv handles its own environments)
+RUN /root/.local/bin/uv pip install --system mcpo
 # Copy built app and install prod deps only
 COPY --from=builder /app/dist ./dist
 COPY package.json pnpm-lock.yaml ./
