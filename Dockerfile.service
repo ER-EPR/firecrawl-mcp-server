@@ -23,8 +23,9 @@ WORKDIR /app
 # Enable pnpm via corepack
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-RUN apk add --no-cache nginx bash curl
-
+RUN apk add --no-cache nginx bash curl python3 py3-pip
+RUN ln -sf python3 /usr/bin/python
+RUN pip install mcpo uv
 # Copy built app and install prod deps only
 COPY --from=builder /app/dist ./dist
 COPY package.json pnpm-lock.yaml ./
